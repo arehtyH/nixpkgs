@@ -13,7 +13,7 @@
   nodejs,
   openssl,
   pkg-config,
-  pnpm_10,
+  pnpm_12,
   fetchPnpmDeps,
   pnpmConfigHook,
   replaceVars,
@@ -33,13 +33,13 @@ in
 
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "modrinth-app-unwrapped";
-  version = "0.21.6";
+  version = "0.23.3";
 
   src = fetchFromGitHub {
     owner = "modrinth";
     repo = "code";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-SBrnyAqbsgAhzF/7p3OalvhJVN/LyHRo9I7m3MEWVxg=";
+    hash = "sha256-gF0HcEGSEu+GcqAcdc9wKwknCLBSe4DZmxwikz0XiXI=";
   };
 
   patches = [
@@ -69,7 +69,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
       --replace-fail '1.0.0-local' '${finalAttrs.version}'
   '';
 
-  cargoHash = "sha256-YQz/DbTZVx1zpct0d4IMBB++RqFg26zmg2Px/xCPa8A=";
+  cargoHash = "sha256-vnKSbclxefGRhQX33SQWdsRJPN1qv3q5IfQsezxkN7o=";
 
   mitmCache = gradle.fetchDeps {
     inherit (finalAttrs) pname;
@@ -78,9 +78,9 @@ rustPlatform.buildRustPackage (finalAttrs: {
 
   pnpmDeps = fetchPnpmDeps {
     inherit (finalAttrs) pname version src;
-    pnpm = pnpm_10;
-    fetcherVersion = 3;
-    hash = "sha256-soooHZJ4OQ+MshWMIhpPURZkMMkpFkZa6AEaiEAm3ts=";
+    pnpm = pnpm_12;
+    fetcherVersion = 5;
+    hash = "sha256-To8aaSLCsYP1+TlPDTjvAzzglTA1J/xbsx+UP1wvjzg=";
   };
 
   nativeBuildInputs = [
@@ -91,7 +91,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
     nodejs
     pkg-config
     pnpmConfigHook
-    pnpm_10
+    pnpm_12
   ]
   ++ lib.optionals stdenv.hostPlatform.isDarwin [
     makeBinaryWrapper
@@ -177,10 +177,6 @@ rustPlatform.buildRustPackage (finalAttrs: {
     ];
     mainProgram = "ModrinthApp";
     platforms = with lib.platforms; linux ++ darwin;
-    # This builds on architectures like aarch64, but the launcher itself does not support them yet.
-    # Darwin is the only exception
-    # See https://github.com/modrinth/code/issues/776#issuecomment-1742495678
-    broken = !stdenv.hostPlatform.isx86_64 && !stdenv.hostPlatform.isDarwin;
     sourceProvenance = with lib.sourceTypes; [
       fromSource
       binaryBytecode # mitm cache
